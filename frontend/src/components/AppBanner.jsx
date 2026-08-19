@@ -3,52 +3,45 @@ import './AppBanner.css'
 
 function AppBanner() {
   const [isVisible, setIsVisible] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
     // Check if already installed
-    if (window.navigator.standalone) {
-      setIsInstalled(true)
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone
+    
+    if (isInstalled) {
       return
     }
 
     // Check if user dismissed banner before
     const dismissed = localStorage.getItem('appBannerDismissed')
-    if (dismissed) {
+    if (dismissed === 'true') {
       return
     }
 
-    // Listen for install prompt
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault()
-      setDeferredPrompt(e)
-      setIsVisible(true)
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-
-    // Check if already installed (for iOS)
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true)
-    }
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    // Check if on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    
+    // Show banner on mobile after 1 second
+    if (isMobile) {
+      setTimeout(() => {
+        setIsVisible(true)
+      }, 1000)
     }
   }, [])
 
-  const handleInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const result = await deferredPrompt.userChoice
-      if (result.outcome === 'accepted') {
-        setIsVisible(false)
-        localStorage.setItem('appInstalled', 'true')
-      }
-      setDeferredPrompt(null)
+  const handleInstall = () => {
+    // For Chrome Android
+    if (window.deferredPrompt) {
+      window.deferredPrompt.prompt()
+      window.deferredPrompt.userChoice.then((result) => {
+        if (result.outcome === 'accepted') {
+          setIsVisible(false)
+          localStorage.setItem('appInstalled', 'true')
+        }
+        window.deferredPrompt = null
+      })
     } else {
-      // iOS fallback - show instructions
+      // For iOS Safari
       alert('📱 Tap the Share button and select "Add to Home Screen"')
     }
   }
@@ -58,12 +51,12 @@ function AppBanner() {
     localStorage.setItem('appBannerDismissed', 'true')
   }
 
-  if (!isVisible || isInstalled) return null
+  if (!isVisible) return null
 
   return (
     <div className="app-banner">
       <button className="banner-close" onClick={handleDismiss}>✕</button>
-      <div className="banner-icon">📱</div>
+      <div className="banner-icon">🚗</div>
       <div className="banner-content">
         <div className="banner-title">Dharma Motors</div>
         <div className="banner-subtitle">Premium Auto Service</div>

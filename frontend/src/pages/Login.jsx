@@ -70,7 +70,7 @@ function Login({ onLogin, isStaffMode, onToggleStaff }) {
       }}>
         <div className="auth-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
   <img 
-    src="/logo.png" 
+   src="/logo.png"
     alt="Dharma Motors"
     style={{ 
       width: '120px',
