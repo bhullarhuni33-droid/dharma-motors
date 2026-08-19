@@ -1,0 +1,284 @@
+/* ============================================
+   SIMPLIFIED VEHICLE HEALTH PASSPORT
+   ============================================ */
+
+.health-passport {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* Header */
+.passport-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.passport-header h2 {
+  font-size: 20px;
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px 8px;
+}
+
+/* Vehicle Card */
+.vehicle-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.vehicle-icon {
+  font-size: 40px;
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+.vehicle-info h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.vehicle-info p {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.vehicle-meta {
+  font-size: 13px !important;
+  color: #888 !important;
+}
+
+.vehicle-km {
+  font-weight: 600;
+  color: #1a1a2e !important;
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  background: white;
+  padding: 14px 10px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stat-num {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Section Cards */
+.section-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.section-card.warning {
+  border-left: 4px solid #ffc107;
+}
+
+.section-card h4 {
+  font-size: 15px;
+  margin: 0 0 12px 0;
+  color: #1a1a2e;
+}
+
+/* Service Item */
+.service-item {
+  padding: 4px 0;
+}
+
+.service-date {
+  font-size: 13px;
+  color: #666;
+}
+
+.service-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.service-status.completed {
+  color: #28a745;
+  font-size: 14px;
+}
+
+.service-days {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Next Service Grid */
+.next-service-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.next-service-grid div {
+  text-align: center;
+}
+
+.next-service-grid .label {
+  display: block;
+  font-size: 11px;
+  color: #999;
+}
+
+.next-service-grid .value {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+/* History Items */
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.history-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.history-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.history-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.history-status {
+  font-size: 12px;
+}
+
+.history-status.completed {
+  color: #28a745;
+}
+
+/* Buttons */
+.book-btn, .book-again-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.book-btn:active, .book-again-btn:active {
+  transform: scale(0.97);
+}
+
+.book-again-btn {
+  margin-top: 8px;
+}
+
+/* Empty State */
+.empty-text {
+  color: #999;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .stats-row {
+    gap: 6px;
+  }
+  
+  .stat-box {
+    padding: 10px 6px;
+  }
+  
+  .stat-num {
+    font-size: 18px;
+  }
+
+  .next-service-grid {
+    gap: 6px;
+  }
+
+  .next-service-grid .value {
+    font-size: 13px;
+  }
+}
