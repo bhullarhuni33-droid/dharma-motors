@@ -6,7 +6,7 @@ import Rewards from './Rewards'
 import Reminders from './Reminders'
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'https://dharma-motors-backend.onrender.com/api'
 })
 
 API.interceptors.request.use((config) => {

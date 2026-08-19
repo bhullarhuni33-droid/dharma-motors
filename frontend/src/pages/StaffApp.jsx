@@ -4,7 +4,7 @@ import './StaffApp.css'
 import ServiceManagement from './pages/ServiceManagement'
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://dharma-motors-backend.onrender.com/api',
   headers: { 'Content-Type': 'application/json' }
 })
 

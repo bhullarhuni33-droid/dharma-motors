@@ -3,7 +3,7 @@ import axios from 'axios';
 import './ServiceManagement.css';
 
 const API = axios.create({
-  baseURL: '/api'
+  baseURL: 'https://dharma-motors-backend.onrender.com/api'
 });
 
 // Add token to requests

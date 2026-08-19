@@ -3,7 +3,7 @@ import axios from 'axios';
 import './Reminders.css';
 
 const API = axios.create({
-  baseURL: '/api'
+  baseURL: 'https://dharma-motors-backend.onrender.com/api'
 })
 
 API.interceptors.request.use((config) => {
