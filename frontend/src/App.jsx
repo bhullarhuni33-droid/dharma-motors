@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Login from './pages/Login'
 import CustomerApp from './pages/CustomerApp'
 import StaffApp from './StaffApp'
+import AppBanner from './components/AppBanner'  // ✅ ADD THIS
 import './index.css'
 
 function App() {
@@ -36,35 +37,37 @@ function App() {
   }
 
   if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        Loading...
-      </div>
-    )
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>
   }
 
   if (!user) {
     return (
-      <Login 
-        onLogin={handleLogin} 
-        isStaffMode={isStaffLogin}
-        onToggleStaff={toggleStaffLogin}
-      />
+      <>
+        <AppBanner />  {/* ✅ ADD THIS */}
+        <Login 
+          onLogin={handleLogin} 
+          isStaffMode={isStaffLogin}
+          onToggleStaff={toggleStaffLogin}
+        />
+      </>
     )
   }
 
-  // If user is staff, show Staff Dashboard
   if (user.role === 'staff') {
-    return <StaffApp user={user} onLogout={handleLogout} />
+    return (
+      <>
+        <AppBanner />  {/* ✅ ADD THIS */}
+        <StaffApp user={user} onLogout={handleLogout} />
+      </>
+    )
   }
 
-  // Customer view
-  return <CustomerApp user={user} onLogout={handleLogout} />
+  return (
+    <>
+      <AppBanner />  {/* ✅ ADD THIS */}
+      <CustomerApp user={user} onLogout={handleLogout} />
+    </>
+  )
 }
 
 export default App
