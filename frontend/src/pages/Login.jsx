@@ -3,7 +3,7 @@ import axios from 'axios'
 import './Auth.css'
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'https://dharma-motors-backend.onrender.com/api'
 })
 
 function Login({ onLogin, isStaffMode, onToggleStaff }) {
