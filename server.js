@@ -6,28 +6,34 @@ const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS - Allow all origins for now
+// ✅ CORS - Allow all origins
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
+
 app.use(express.json());
 
-// Initialize Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
 // ============================================
-// STAFF LOGIN
+// ✅ HARDCODED ADMIN CREDENTIALS
+// ============================================
+const ADMIN_MOBILE = '7696707446';
+const ADMIN_PASSWORD = 'armnbhullar3354';
+const STAFF_SECRET_KEY = 'armnbhullar3354';
+
+// ============================================
+// STAFF LOGIN (Only for admin)
 // ============================================
 app.post('/api/auth/staff-login', async (req, res) => {
   try {
@@ -39,58 +45,93 @@ app.post('/api/auth/staff-login', async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const STAFF_PASSWORD = 'armnbhullar3354';
-    
-    if (staff_password !== STAFF_PASSWORD) {
+    // ✅ Check if mobile matches admin
+    if (mobile !== ADMIN_MOBILE) {
+      console.log('❌ Not admin mobile:', mobile);
+      return res.status(401).json({ error: 'Invalid admin credentials' });
+    }
+
+    // ✅ Check staff secret key
+    if (staff_password !== STAFF_SECRET_KEY) {
+      console.log('❌ Wrong staff key');
       return res.status(401).json({ error: 'Invalid staff credentials' });
     }
 
-    const { data: customer, error: findError } = await supabase
+    // ✅ Check password
+    if (password !== ADMIN_PASSWORD) {
+      console.log('❌ Wrong password');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Find or create admin in database
+    let { data: customer, error: findError } = await supabase
       .from('customers')
       .select('*')
       .eq('mobile', mobile)
       .single();
 
+    // If admin doesn't exist, create them
     if (!customer) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const isValidPassword = await bcrypt.compare(password, customer.password);
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    if (customer.role !== 'staff') {
-      await supabase
+      console.log('🔄 Creating admin account...');
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      const { data: newCustomer, error: insertError } = await supabase
         .from('customers')
-        .update({ role: 'staff' })
-        .eq('id', customer.id);
-      customer.role = 'staff';
+        .insert([
+          { 
+            full_name: 'Admin',
+            mobile: mobile,
+            email: 'admin@workshop.com',
+            password: hashedPassword,
+            role: 'staff'
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('❌ Insert error:', insertError);
+        return res.status(500).json({ error: 'Failed to create admin' });
+      }
+      customer = newCustomer;
+      console.log('✅ Admin account created!');
+    } else {
+      // Ensure admin has staff role
+      if (customer.role !== 'staff') {
+        await supabase
+          .from('customers')
+          .update({ role: 'staff' })
+          .eq('id', customer.id);
+        customer.role = 'staff';
+      }
     }
 
+    // Generate token
     const token = jwt.sign(
-      { id: customer.id, mobile: customer.mobile, role: customer.role },
+      { id: customer.id, mobile: customer.mobile, role: 'staff' },
       process.env.JWT_SECRET || 'armnbhullar3354',
       { expiresIn: '7d' }
     );
 
     delete customer.password;
 
+    console.log('✅ Admin login successful!');
+
     res.json({
       success: true,
-      message: 'Staff login successful!',
+      message: 'Admin login successful!',
       token: token,
       user: customer
     });
 
   } catch (error) {
-    console.error('Staff login error:', error);
+    console.error('❌ Staff login error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
 // ============================================
-// REGULAR LOGIN
+// REGULAR LOGIN (For customers)
 // ============================================
 app.post('/api/auth/login', async (req, res) => {
   try {
@@ -137,7 +178,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ============================================
-// REGISTER
+// REGISTER (For customers)
 // ============================================
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -145,6 +186,17 @@ app.post('/api/auth/register', async (req, res) => {
 
     if (!full_name || !mobile || !password) {
       return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Check if user already exists
+    const { data: existing } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('mobile', mobile)
+      .single();
+
+    if (existing) {
+      return res.status(400).json({ error: 'Customer already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -189,7 +241,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // ============================================
-// IMPORT ROUTES
+// IMPORT OTHER ROUTES
 // ============================================
 const customerRoutes = require('./backend/routes/customers');
 const vehicleRoutes = require('./backend/routes/vehicles');
@@ -202,9 +254,6 @@ const healthPassportRoutes = require('./backend/routes/healthpassport');
 const serviceRoutes = require('./backend/routes/services');
 const staffRoutes = require('./backend/routes/staff');
 
-// ============================================
-// USE ROUTES
-// ============================================
 app.use('/api/customers', customerRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/appointments', appointmentRoutes);
@@ -216,20 +265,12 @@ app.use('/api/passport', healthPassportRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/staff', staffRoutes);
 
-// ============================================
-// TEST ROUTE
-// ============================================
 app.get('/', (req, res) => {
-  res.json({ 
-    message: '🚗 Workshop API is running!',
-    status: '✅ Ready'
-  });
+  res.json({ message: '🚗 Workshop API is running!' });
 });
 
-// ============================================
-// START SERVER
-// ============================================
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`🔐 Staff Password: armnbhullar3354`);
+  console.log(`🔐 Admin Mobile: 7696707446`);
+  console.log(`🔐 Admin Password: armnbhullar3354`);
 });
